@@ -1,18 +1,22 @@
 import { useEffect } from "react";
-import { authService } from "../service/login-service";
 import { useNavigate } from "react-router-dom";
+import { Card, Button, Typography, Space, message } from "antd";
+import { LoginOutlined } from "@ant-design/icons";
+import { authService } from "../service/login-service";
+
+const { Title, Text } = Typography;
 
 export default function LoginPage() {
   const navigate = useNavigate();
 
-  // const redirectedRef = useRef(false);
-
   const handleLogin = async () => {
     try {
-      await authService.login(); // login bằng MSAL 
-      navigate("/"); // chuyển về trang chủ sau login
+      await authService.login(); // login bằng MSAL
+      message.success("Login successful!");
+      navigate("/"); // chuyển về trang chủ
     } catch (err) {
       console.error("Login failed", err);
+      message.error("Login failed. Check console.");
     }
   };
 
@@ -22,20 +26,39 @@ export default function LoginPage() {
     }
   }, [navigate]);
 
-  // const handleLogout = () => {
-  //   authService.logout();
-  //   navigate("/login"); // quay lại login page
-  // };
-
   return (
-    <div style={{ textAlign: "center", marginTop: "50px" }}>
-      <h1>Login Page</h1>
-      <button onClick={handleLogin} style={{ padding: "10px 20px", marginTop: "20px" }}>
-        Login
-      </button>
-      {/* <button onClick={handleLogout} style={{ padding: "10px 20px", marginTop: "20px" }}>
-        Logout
-      </button> */}
+    <div
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        background: "#f0f2f5",
+        padding: 24,
+      }}
+    >
+      <Card
+        style={{ width: 400, textAlign: "center" }}
+        hoverable
+        bordered={false}
+      >
+        <Space direction="vertical" size="large" style={{ width: "100%" }}>
+          <Title level={2} style={{ margin: 0 }}>
+            Welcome Back
+          </Title>
+          <Text type="secondary">Please login to continue</Text>
+
+          <Button
+            type="primary"
+            size="large"
+            icon={<LoginOutlined />}
+            onClick={handleLogin}
+            block
+          >
+            Login
+          </Button>
+        </Space>
+      </Card>
     </div>
   );
 }

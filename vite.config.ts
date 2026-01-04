@@ -14,13 +14,13 @@ export default defineConfig({
     host: 'localhost',
     port: 4200,
 
-    // proxy: {
-    //   "/apim": {
-    //     target: "https://localhost:7213",
-    //     changeOrigin: true,
-    //     secure: false,
-    //     rewrite: (path) => path.replace(/^\/apim/, ""),
-    //   },
-    // },
+    proxy: {
+      "/apim": {
+        target: "https://localhost:44306",
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/apim/, ""),
+      },
+    },
   }
 })

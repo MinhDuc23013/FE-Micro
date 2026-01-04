@@ -5,6 +5,7 @@ import { MsalProvider } from "@azure/msal-react";
 import { msalInstance } from "./auth/msalInstance";
 
 await msalInstance.initialize();
+// msalInstance.clearCache();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

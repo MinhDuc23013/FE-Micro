@@ -1,47 +1,86 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import apiClient from "../axiosConfig/axios-azure-ad";
+import { Layout, Menu, Avatar, Typography, Button, Table, message, Space } from "antd";
+import { UserOutlined, LogoutOutlined, CloudOutlined, HomeOutlined } from "@ant-design/icons";
 import { authService } from "../service/login-service";
 import { useAuth } from "../hooks/useAuth";
+import apiClient from "../axiosConfig/axios-azure-ad";
+
+const { Header, Sider, Content } = Layout;
+const { Text } = Typography;
 
 export default function HomePage() {
-
-const { user } = useAuth();    
+  const { user } = useAuth();
   const navigate = useNavigate();
+  const [collapsed, setCollapsed] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  // Demo Table data
+  const columns = [
+    { title: "ID", dataIndex: "id", key: "id" },
+    { title: "Name", dataIndex: "name", key: "name" },
+    { title: "Email", dataIndex: "email", key: "email" },
+  ];
+
+  const data = [
+    { id: 1, name: "John Doe", email: "john@example.com" },
+    { id: 2, name: "Jane Smith", email: "jane@example.com" },
+    { id: 3, name: "Bob Johnson", email: "bob@example.com" },
+  ];
 
   const handleLogout = () => {
     authService.logout();
-    navigate("/login"); // quay lại login page
+    navigate("/login");
   };
 
   const callApi = async () => {
     try {
+      setLoading(true);
+
       const res = await apiClient.get("/api/WeatherForecast");
       console.log(res.data);
-      // alert(JSON.stringify(res.data, null, 2));
+
+      message.success("Demo API called!");
+      // Gọi API thật ở đây nếu cần
     } catch (err) {
       console.error(err);
-      alert("Call API failed, check console");
+      message.error("Call API failed");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div style={{ textAlign: "center", marginTop: "50px" }}>
-      <h1>Welcome to Home Page</h1>
+    <Layout style={{ minHeight: "100vh" }}>
+      {/* Sidebar */}
+      <Sider collapsible collapsed={collapsed} onCollapse={setCollapsed}>
+        <div style={{ height: 32, margin: 16, background: "rgba(255,255,255,0.3)" }} />
+        <Menu theme="dark" defaultSelectedKeys={["1"]} mode="inline">
+          <Menu.Item key="1" icon={<HomeOutlined />}>Home</Menu.Item>
+          <Menu.Item key="2" icon={<CloudOutlined />} onClick={callApi}>Call API</Menu.Item>
+        </Menu>
+      </Sider>
 
-    <div>
-      <h1>Welcome, {user?.name}</h1>
-      <p>Email: {user?.username}</p>
-      <p>Object Id: {user?.homeAccountId}</p>
-    </div>
+      {/* Main layout */}
+      <Layout>
+        {/* Navbar / Header */}
+        <Header style={{ background: "#fff", padding: "0 24px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <Text strong style={{ fontSize: 18 }}>Dashboard</Text>
+          <Space size="middle">
+            <Text>{user?.name}</Text>
+            <Avatar icon={<UserOutlined />} />
+            <Button type="primary" danger icon={<LogoutOutlined />} onClick={handleLogout}>
+              Logout
+            </Button>
+          </Space>
+        </Header>
 
-      <div style={{ marginTop: "30px" }}>
-        <button onClick={callApi} style={{ padding: "10px 20px", marginRight: "10px" }}>
-          Call API
-        </button>
-        <button onClick={handleLogout} style={{ padding: "10px 20px" }}>
-          Logout
-        </button>
-      </div>
-    </div>
+        {/* Content */}
+        <Content style={{ margin: "24px", background: "#fff", padding: 24, minHeight: 360 }}>
+          <Text strong style={{ fontSize: 16 }}>Demo Table</Text>
+          <Table columns={columns} dataSource={data} rowKey="id" style={{ marginTop: 16 }} />
+        </Content>
+      </Layout>
+    </Layout>
   );
 }

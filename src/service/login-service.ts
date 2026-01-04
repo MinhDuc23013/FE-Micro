@@ -29,19 +29,26 @@ export const authService = {
     }
 
     try {
-
       const tokenResult = await msalInstance.acquireTokenSilent({
         ...accessTokenRequest,
         account: accounts[0],
-
       });
 
       console.log(tokenResult.accessToken);
+      try {
+        const payload = JSON.parse(atob(tokenResult.accessToken.split('.')[1]));
+        console.log("token ver:", payload.ver);
+      } catch (e) {
+        console.warn("Failed to decode access token", e);
+      }
+      return tokenResult;
 
-      return tokenResult
     } catch (error) {
       if (error instanceof InteractionRequiredAuthError) {
-        return await msalInstance.acquireTokenPopup(loginRequest);
+        return await msalInstance.acquireTokenPopup({
+          ...accessTokenRequest,
+          account: accounts[0],
+        });
       }
       throw error;
     }
